@@ -1,40 +1,41 @@
 from django.contrib import auth
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from .models import member
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from login.forms import UserForm
 from django.contrib.auth.decorators import login_required
 
-def login(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = auth.authenticate(request, username=username, password=password)
-        if user is not None:
-            auth.login(request, user)
-            return HttpResponseRedirect('/blog/')
-        else:
-            return render(request, 'login/log.html', {'error': 'username or password is incorrect'})
-            # 로그인 실패시 'username or password is incorrect' 메시지를 띄움
-    else:
-        return render(request, 'login/log.html')
+def login_view(request): #로그인 뷰
 
+        if request.method == "POST": #POST메소드를 이용해서 요청할 것이다
+                username = request.POST["username"] #POST로 요청받는 username
+                password = request.POST["password"] #POST로 요청받는 password
+                user = authenticate(username=username, password=password) #POST로 요청받은 것이 기존에 있는 username과 password와 맞는지 확인
+                if user is not None: #인증성공시 콘솔 출력 화면
+                        print("인증성공")
+                        login(request, user)
+                else: #인증실패시 콘솔 출력 화면
+                        print("인증실패")
 
-def signup(request):
-    """
-    계정생성
-    """
-    if request.method == "POST":
-        form = UserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('index')
-    else:
-        form = UserForm()
-    return render(request, 'login/signup.html', {'form': form})
+        return render(request, 'login/log.html') #html로 연결되어 화면을 랜더링(그리기) 한다.
+
+def logout_view(request): #로그아웃 뷰
+        logout(request)
+        return redirect("logins:login") #로그아웃시 로그인 페이지로 돌아간다
+
+def signup_view(request): #회원가입 뷰
+        if request.method =="POST": #POST메소드를 이용해서 요청할 것이다
+                username = request.POST["username"] #POST로 요청받는 username
+                password = request.POST["password"] #POST로 요청받는 password
+                name = request.POST["name"] #POST로 요청받는 name
+                email = request.POST["email"] #POST로 요청받는 email
+                dept = request.POST["dept"] #POST로 요청받는 dept
+
+                user = member.objects.create_user(username, email, password) #member 데이터베이스와 연결해서 데이터 베이스에 정보 등록
+                user.name = name #이름 항목 추가
+                user.dept = dept #부서 항목 추가
+                user.save() #저장
+                return redirect("logins:login") #회원가입 후 로그인 화면으로 돌아간다
+
+        return render(request, "login/signup.html") #html로 연결되어 화면을 랜더링(그리기) 한다.
 
