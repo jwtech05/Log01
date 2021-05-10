@@ -1,10 +1,18 @@
-로그인 페이지
+{% load static %}
+<br>
+<img src="{% static 'MJUPLEX1.png' %}" alt="">
 <br>
 
 {% if user.is_authenticated %}
-    로그인 성공!
-    {{ user.username }}님 환영합니다.
-
+    {% if not user.profile_img %}
+        <img src="{% static 'void.png' %}" width="200"><br>
+    {% else %}
+        <img src="{{ user.profile_img.url }}" width = "200"><br>
+    {% endif %}
+    이름: {{ user.username }}<br>
+    이메일: {{ user.email }}<br>
+    부서: {{ user.dept }}<br>
+    우편번호: {{ user.add }}<br>
     <a href="{% url 'logins:logout' %}">로그아웃</a>
 {% else %}
 

@@ -1,0 +1,23 @@
+{% load static %}
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8">
+		<title>CSS</title>
+		<style>
+			img { display: block; margin: 0px auto; }
+            p{
+                text-align: center;
+            }
+		</style>
+	</head>
+	<body>
+		<img src="{% static 'MJUPLEX1.png' %}" alt=""><br>
+        <p>
+            <a href="{% url 'logins:login' %}">로그인</a><br>
+            안지원 | 이준렬 | 이동현
+        </p>
+
+	</body>
+</html>
